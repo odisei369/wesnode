@@ -65,5 +65,10 @@ router.post('/register',
     userController.register,
     authController.login
 );
+//API endpoints
+
+router.get('/api/search', catchErrors(storeController.searchStores));
+
+
 
 module.exports = router;

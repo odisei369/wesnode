@@ -36,7 +36,7 @@ exports.myMiddleWare = (req, res, next) => {
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
-    const store = await Store.findOne({slug: req.params.slug});
+    const store = await Store.findOne({slug: req.params.slug}).populate('author');
     //if there is no such slug - 404
     if(!store) return next();
     res.render('store', {store, title: store.name});
@@ -51,6 +51,7 @@ exports.addStore = (req, res) => {
 };
 
 exports.createStore = async (req, res) => {
+    req.body.author = req.user._id;
     console.log(req.body);
     const store = await (new Store(req.body)).save();
     req.flash("success", 'Store successfully created');
@@ -63,10 +64,35 @@ exports.getStores = async (req, res) =>
     res.render("stores", {title:"Stores", stores});
 };
 
+const confirmOwner =  (user, store) =>
+{
+    if(!store.author.equals(user._id)){
+        throw Error('You must own the store to edit it!')
+    }
+};
+
+exports.searchStores = async (req, res) =>
+{
+    const stores = await Store
+        .find({
+        $text: {
+            $search: req.query.q
+        }
+        }, {
+        score: { $meta: 'textScore' }
+        })
+        .sort({
+            score: {$meta: 'textScore'}
+        })
+        .limit(5);
+
+    res.json(stores);
+};
+
 exports.editStore = async (req, res) =>
 {
     const store = await Store.findOne({_id : req.params.id});
-
+    confirmOwner(req.user, store);
 
     res.render('editStore', {title: `Edit ${store.name}`, store});
 };
