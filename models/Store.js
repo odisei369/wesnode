@@ -38,6 +38,12 @@ storeSchema.index({
     description: 'text',
     name: 'text'
 });
+
+storeSchema.index({
+    location: '2dsphere'
+});
+
+//TODO implement striping unnecesarry HTML from description and name
 storeSchema.pre('save', async function (next) {
     if(!this.isModified('name'))
     {

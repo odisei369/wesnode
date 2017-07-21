@@ -1057,6 +1057,8 @@ function typeAhead(search) {
                 return;
             }
             searchResults.innerHTML = _dompurify2.default.sanitize('<div class="search__result">No results for ' + _this.value + '</div>');
+        }).catch(function (err) {
+            console.log(err);
         });
     });
 

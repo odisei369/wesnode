@@ -83,7 +83,7 @@ exports.searchStores = async (req, res) =>
         })
         .sort({
             score: {$meta: 'textScore'}
-        })
+        }).select('slug name')
         .limit(5);
 
     res.json(stores);
@@ -118,4 +118,22 @@ exports.getStoreByTag = async (req, res) =>
     const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
 
     res.render('tags', {tags, title: 'Tags', tag, stores})
+};
+
+exports.mapStores = async (req, res) =>
+{
+    const coordinates = [req.query.lng, req.query.lat].map(parseFloat);
+    const q = {
+        location: {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates
+                },
+                $maxDistance: 10000 // in meters
+            }
+        }
+    };
+    const stores = await Store.find(q).select('slug name description location').limit(10);
+    res.json(stores);
 };

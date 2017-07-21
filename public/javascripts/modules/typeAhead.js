@@ -31,7 +31,7 @@ function typeAhead(search){
                     return;
                 }
                     searchResults.innerHTML = dompurify.sanitize(`<div class="search__result">No results for ${this.value}</div>`);
-            })
+            }).catch(err =>{console.log(err)});
     });
 
     //handle keyboard
