@@ -137,3 +137,7 @@ exports.mapStores = async (req, res) =>
     const stores = await Store.find(q).select('slug name description location').limit(10);
     res.json(stores);
 };
+
+exports.heartStore = async (req, res) => {
+    const hearts = req.user.hearts
+};
