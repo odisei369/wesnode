@@ -25,6 +25,8 @@ router.post('/account',
     catchErrors(userController.updateAccount)
 );
 
+router.get('/map', storeController.mapPage);
+
 router.post('/account/forgot', catchErrors(authController.forgot));
 
 router.get('/account/reset/:token', catchErrors(authController.reset));
