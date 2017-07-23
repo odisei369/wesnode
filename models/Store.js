@@ -29,10 +29,13 @@ const storeSchema = new mongoose.Schema({
     author: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
-        required: 'Yiu must supply an author'
+        required: 'You must supply an author'
     }
-
-});
+},
+    {
+        toJSON: {virtuals: true},
+        toObject: {virtuals: true}
+    });
 
 storeSchema.index({
     description: 'text',
@@ -66,5 +69,14 @@ storeSchema.statics.getTagList = function () {
         { $group: { _id: '$tags', count: { $sum: 1 } } },
         { $sort: { count: -1}}
     ]);
-}
+};
+
+
+//find reviews where the stores _id === reviews store property
+storeSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'store'
+});
+
 module.exports = mongoose.model('Store', storeSchema);
