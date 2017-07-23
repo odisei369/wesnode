@@ -154,3 +154,10 @@ exports.mapPage = (req, res) =>
 {
     res.render('map', {title: 'Map'});
 };
+
+exports.hearts = async (req, res) => {
+    const stores = await Store.find({
+        _id: { $in: req.user.hearts}
+    });
+    res.render('stores', {title: 'Your hearted stores', stores})
+};
