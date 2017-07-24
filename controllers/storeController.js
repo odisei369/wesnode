@@ -61,7 +61,7 @@ exports.createStore = async (req, res) => {
 exports.getStores = async (req, res) =>
 {
     const page = req.params.page || 1;
-    const limit = 4;
+    const limit = 6;
     const skip = (page * limit) - limit;
     const storesPromise = Store
         .find()
@@ -175,4 +175,9 @@ exports.hearts = async (req, res) => {
         _id: { $in: req.user.hearts}
     });
     res.render('stores', {title: 'Your hearted stores', stores})
+};
+
+exports.getTopStores = async (req, res) => {
+    const stores = await Store.getTopStores();
+    res.render('topStores', {title: `Top ${stores.length} Stores`, stores})
 };

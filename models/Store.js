@@ -71,12 +71,41 @@ storeSchema.statics.getTagList = function () {
     ]);
 };
 
-
+function autoPopulate(next) {
+    this.populate('reviews');
+    next();
+}
 //find reviews where the stores _id === reviews store property
 storeSchema.virtual('reviews', {
     ref: 'Review',
     localField: '_id',
     foreignField: 'store'
 });
+
+storeSchema.statics.getTopStores = function () {
+    return this.aggregate([
+        //Lookup stores and populate their reviews
+        { $lookup:
+            {from:'reviews', localField: '_id', foreignField: 'store', as: 'reviews'}
+        },
+        //filter for those that have 2 or more reviews
+        { $match:
+            {
+                'reviews.1': { $exists: true}
+            }
+        },
+        //add the average review field
+        { $addFields: {
+            averageRating: { $avg: '$reviews.rating'}
+        }},
+        //sort by average review
+        { $sort: { averageRating: -1}},
+        //limit to 10 stores
+        { $limit: 10}
+    ]);
+};
+
+storeSchema.pre('find', autoPopulate);
+storeSchema.pre('findOne', autoPopulate);
 
 module.exports = mongoose.model('Store', storeSchema);
